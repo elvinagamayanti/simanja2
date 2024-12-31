@@ -41,6 +41,10 @@ class LoginController extends Controller
         $this->middleware('guest')->except('logout');
     }
 
+    public function showformlogin(){
+        return view('auth.login');
+    }
+
     public function login(Request $request)
     {
         // Lakukan validasi
@@ -49,17 +53,22 @@ class LoginController extends Controller
             'password' => 'required',
         ]);
 
+         // Debug: Tampilkan input email dan password
+        //dd($request->email, $request->password);
+
+
         // Jika validasi berhasil, otentikasi pengguna
         if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
             $user = Auth::user();
+            //dd($user->role);
 
             // Tambahkan data ke session
             $request->session()->put('id', $user->id);
             $request->session()->put('name', $user->name);
             $request->session()->put('role', $user->role);
 
-            if ($user->role == 'admin') return redirect()->intended('visual');
-            else return redirect()->intended('visual');
+            if ($user->role == 'admin') return redirect()->intended('/simanja/dashboard');
+            else return redirect()->intended('/simanja/dashboard');
         }
 
         // Jika otentikasi gagal
@@ -78,6 +87,6 @@ class LoginController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect('/login');
+        return redirect('/simanja');
     }
 }
